@@ -30,13 +30,13 @@ def installazioneFile():
     bootLauncherFlowYMT = value + '\\x64\\' + 'boot_launcher_flow.ymt'
     startupMETA = value + '\\x64\\data\\' + 'startup.meta'
 
-    urlBootLauncherFlowYMT = "https://raw.githubusercontent.com/TheTimeLord32/Red-Dead-Online-Tool/main/src/boot_launcher_flow.ymt"
+    urlBootLauncherFlowYMT = "https://raw.githubusercontent.com/TheTimeLord32/Red-Dead-Online-Tool/master/src/boot_launcher_flow.ymt"
     r1 = requests.get(urlBootLauncherFlowYMT)
     with open(bootLauncherFlowYMT, 'wb') as f:
         f.write(r1.content)
     f.close()
 
-    urlstartupMETA = "https://raw.githubusercontent.com/TheTimeLord32/Red-Dead-Online-Tool/main/src/startup.meta"
+    urlstartupMETA = "https://raw.githubusercontent.com/TheTimeLord32/Red-Dead-Online-Tool/master/src/startup.meta"
     r2 = requests.get(urlstartupMETA)
     with open(startupMETA, 'wb') as f:
         f.write(r2.content)
