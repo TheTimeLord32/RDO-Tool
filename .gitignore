@@ -1,3 +1,4 @@
 /build
 /dist
-/Main.spec
+/**/*.spec
+/path.txt
