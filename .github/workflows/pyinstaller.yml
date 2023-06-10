@@ -1,0 +1,45 @@
+name: PyInstaller Build
+
+on:
+  push:
+    branches:
+      - master  # Adjust the branch name if necessary
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.11  # Specify the desired Python version
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r
+
+    - name: Build with PyInstaller
+      run: |
+        pyinstaller -f -W RDOTool.py
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v2.1  # Specify the desired tag name
+        release_name: RDOTool 2.1  # Specify the desired release name
+        draft: false
+        prerelease: false
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: RDOTool.exe  # Replace 'your_script' with the desired artifact name
+        path: dist/RDOTool.exe  # Replace 'your_script' with the actual file name
