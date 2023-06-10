@@ -2,3 +2,4 @@
 /dist
 /**/*.spec
 /path.txt
+.venv

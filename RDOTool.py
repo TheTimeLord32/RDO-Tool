@@ -5,7 +5,16 @@ from tkinter import filedialog
 
 win=tk.Tk()
 win.title('RDO Tool')
-win.geometry('300x300')
+win.geometry('500x300')
+
+uniqueKey = tk.StringVar()
+uniqueKey_label = tk.Label(win, text="Unique key: ")
+uniqueKey_label.pack(fill='x', expand=True)
+uniqueKey_label.place(x = 210, y = 30)
+
+uniqueKey_entry = tk.Entry(win, textvariable=uniqueKey)
+uniqueKey_entry.pack(fill='x', expand=True)
+uniqueKey_entry.place(x = 210, y = 60)
 
 def path():
     root = tk.Tk()
@@ -19,6 +28,18 @@ def path():
         file.write(file_path)
         file.close()
         messagebox.showinfo("Choose Folder", "Path saved successfully !")
+
+def checkACL():
+    path = open("path.txt", "r")
+    value = path.readline()
+    path.close()
+    try:
+        os.access(value, os.W_OK)               #check write acl
+        os.access(value, os.R_OK)               #check read acl
+        os.access(value, os.X_OK)               #check exec acl
+        os.access(value, os.X_OK | os.W_OK)     #check write file acl
+    except PermissionError:
+        messagebox.showerror("RDO Tool", "Restart the program with Administrator permission to access this folder !")
 
 def installFile():
     path = open("path.txt", "r")
@@ -55,6 +76,7 @@ def readFile():
     return boot_disable, startup_disable, boot_enable, startup_enable
 
 def activateFile():
+    checkACL()
     try:
         boot_disable, startup_disable, boot_enable, startup_enable = readFile()
         os.rename(boot_disable, boot_enable)
@@ -64,6 +86,7 @@ def activateFile():
         messagebox.showerror("Activate file", "Path not found or file already activated. Retry")
 
 def deactivateFile():
+    checkACL()
     try:
         boot_disable, startup_disable, boot_enable, startup_enable = readFile()
         os.rename(boot_enable, boot_disable)
@@ -72,14 +95,65 @@ def deactivateFile():
     except FileNotFoundError:
         messagebox.showerror("Deactivate file", "Path not found or file already deactivated. Retry")
 
-folder = tk.Button(win, text="Choose Folder", width=10 ,height=5 ,command=path)
-install = tk.Button(win, text="Install file", width=10 ,height=5 ,command=installFile)
+def findOldString():
+    try:
+        path = open("path.txt", "r")
+        directory = path.readline()
+        path.close()
+        boot_enable = directory + "/x64/boot_launcher_flow.ymt"
+        startup_enable = directory + "/x64/data/startup.meta"
+
+        files = [boot_enable, startup_enable]
+
+        for x in files:
+            with open(x, 'r') as file:
+                file_contents = file.readlines()
+                secondline = file_contents[1].strip()
+
+        oldKey = secondline[4: -3]
+        return oldKey
+
+    except FileNotFoundError:
+        messagebox.showerror("Files not found!")
+
+def replaceString():
+    try:
+        path = open("path.txt", "r")
+        directory = path.readline()
+        path.close()
+        boot_enable = directory + "/x64/boot_launcher_flow.ymt"
+        startup_enable = directory + "/x64/data/startup.meta"
+        old_string = findOldString()
+        new_string = uniqueKey.get()
+
+        files = [boot_enable, startup_enable]
+        for file_path in files:
+            # Read the contents of the file
+            with open(file_path, 'r') as file:
+                file_contents = file.read()
+
+            # Replace the old string with the new string
+            modified_contents = file_contents.replace(old_string, new_string)
+
+            # Write the modified contents back to the file
+            with open(file_path, 'w') as file:
+                file.write(modified_contents)
+
+        messagebox.showinfo("Replace unique key", "Unique key saved successfully!")
+    except FileNotFoundError:
+        messagebox.showerror("Replace unique key", "Path not found!")
+
+folder = tk.Button(win, text="Choose Folder", width=10, height=5, command=path)
+install = tk.Button(win, text="Install file", width=10, height=5, command=installFile)
 activate = tk.Button(win, text = "Activate file", width=10, height=5, command=activateFile)
 deactivate = tk.Button(win, text = "Deactivate file", width=10, height=5, command=deactivateFile)
+replace = tk.Button(win, text="Replace unique key", width=25, height=5, command=replaceString)
 
 folder.place(x = 30,y = 30)
 install.place(x = 120, y = 30)
 activate.place(x = 30, y = 120)
 deactivate.place(x = 120, y = 120)
+replace.place(x = 210, y = 120)
 
 win.mainloop()
+os._exit(0)

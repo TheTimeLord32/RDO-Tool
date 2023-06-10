@@ -6,3 +6,7 @@
 1. Press the button _Install File_.
 1. It will download the needed file for private lobby.
 1. You are ready for a private lobby in Red Dead Online
+
+## Todo
+- [ ]: Background
+- [X]: Custom rule for session
