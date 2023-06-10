@@ -13,33 +13,22 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
+    - name: Package Application
+      uses: JackMcKew/pyinstaller-action-windows@main
       with:
-        python-version: 3.11  # Specify the desired Python version
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
-    - name: Build with PyInstaller
-      run: |
-        pyinstaller -F -w RDOTool.py
+        path: src
 
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v2.1  # Specify the desired tag name
-        release_name: RDOTool 2.1  # Specify the desired release name
+        tag_name: v2.1
+        release_name: RDOTool 2.1
         draft: false
         prerelease: false
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: RDOTool.exe  # Replace 'your_script' with the desired artifact name
-        path: dist/RDOTool.exe  # Replace 'your_script' with the actual file name
+        name: RDOTool.exe
+        path: src/dist/RDOTool.exe 
