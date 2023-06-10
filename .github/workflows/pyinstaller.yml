@@ -3,7 +3,7 @@ name: PyInstaller Build
 on:
   push:
     branches:
-      - master  # Adjust the branch name if necessary
+      - master
 
 jobs:
   build:
@@ -13,17 +13,26 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Package Application
-      uses: JackMcKew/pyinstaller-action-windows@main
+    - name: Set up Python
+      uses: actions/setup-python@v2
       with:
-        path: src
+        python-version: 3.11
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Build with PyInstaller
+      run: |
+        pyinstaller -F -w RDOTool.py
 
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       with:
         tag_name: v2.1
-        release_name: RDOTool 2.1
+        release_name: RDOTool v2.1
         draft: false
         prerelease: false
 
@@ -31,4 +40,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: RDOTool.exe
-        path: src/dist/RDOTool.exe 
+        path: src/dist/RDOTool.exe
