@@ -8,5 +8,5 @@
 1. You are ready for a private lobby in Red Dead Online
 
 ## Todo
-- [ ]: Background
-- [X]: Custom rule for session
+- [ ] Background
+- [x] Custom rule for session
