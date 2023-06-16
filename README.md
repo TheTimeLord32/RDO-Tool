@@ -11,6 +11,7 @@
 ## Todo
 - [ ] Background & Icon
 - [x] Show current path
-- [ ] Show current key
+- [x] Show current key
 - [ ] Show current file status
 - [x] Custom rule for session
+- [ ] Instructions
