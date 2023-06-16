@@ -5,29 +5,46 @@ from tkinter import filedialog
 
 win=tk.Tk()
 win.title('RDO Tool')
-win.geometry('500x300')
+win.geometry('600x300')
 
 uniqueKey = tk.StringVar()
 uniqueKey_label = tk.Label(win, text="Unique key: ")
 uniqueKey_label.pack(fill='x', expand=True)
-uniqueKey_label.place(x = 210, y = 30)
+uniqueKey_label.place(x = 210, y = 70)
 
 uniqueKey_entry = tk.Entry(win, textvariable=uniqueKey)
 uniqueKey_entry.pack(fill='x', expand=True)
-uniqueKey_entry.place(x = 210, y = 60)
+uniqueKey_entry.place(x = 210, y = 90)
 
-def path():
+def choosePath():
     root = tk.Tk()
     root.withdraw()
     file_path = filedialog.askdirectory()
     while file_path == "":
         messagebox.showerror("Choose Folder", "No Path Selected !")
         file_path = filedialog.askdirectory()
+        showPath()
     else:
         file = open("path.txt", "w")
         file.write(file_path)
         file.close()
         messagebox.showinfo("Choose Folder", "Path saved successfully !")
+        showPath()
+
+def showPath():
+    # try:
+        path = open("path.txt", "r")
+        value = path.readline()
+        path.close()
+        currentPath = tk.Label(win, text="Current Folder Path:")
+        currentPath.pack(fill='x', expand=True)
+        currentPath.place(x = 210, y=30)
+        
+        currentPathValue = tk.Label(win, text=value)
+        currentPathValue.pack(fill='x', expand=True)
+        currentPathValue.place(x = 210, y=50)
+    # except FileNotFoundError:
+        # choosePath()
 
 def checkACL():
     path = open("path.txt", "r")
@@ -143,7 +160,7 @@ def replaceString():
     except FileNotFoundError:
         messagebox.showerror("Replace unique key", "Path not found!")
 
-folder = tk.Button(win, text="Choose Folder", width=10, height=5, command=path)
+folder = tk.Button(win, text="Choose Folder", width=10, height=5, command=choosePath)
 install = tk.Button(win, text="Install file", width=10, height=5, command=installFile)
 activate = tk.Button(win, text = "Activate file", width=10, height=5, command=activateFile)
 deactivate = tk.Button(win, text = "Deactivate file", width=10, height=5, command=deactivateFile)
