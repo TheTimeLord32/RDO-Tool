@@ -5,7 +5,7 @@ from tkinter import filedialog
 
 win=tk.Tk()
 win.title('RDO Tool')
-win.geometry('700x300')
+win.geometry('700x400')
 
 def choosePath():
     root = tk.Tk()
@@ -52,6 +52,14 @@ def checkACL():
 
 def installFile():
     try:
+        boot_disable, startup_disable, boot_enable, startup_enable = readFile()
+        
+        if (os.path.isfile(boot_disable) & os.path.isfile(startup_disable)):
+            return messagebox.showinfo("Install file", "Files already installed but deactivated !")
+        if (os.path.isfile(boot_enable) & os.path.isfile(startup_enable)):
+            return messagebox.showinfo("Install file", "Files already installed and activated !")
+        
+    except FileNotFoundError:
         path = open("path.txt", "r")
         value = path.readline()
         path.close()
@@ -94,23 +102,29 @@ def readFile():
 
 def activateFile():
     checkACL()
-    try:
-        boot_disable, startup_disable, boot_enable, startup_enable = readFile()
-        os.rename(boot_disable, boot_enable)
-        os.rename(startup_disable, startup_enable)
-        messagebox.showinfo("Activate file", "File activated !")
-    except FileNotFoundError:
-        messagebox.showerror("Activate file", "Path not found or file already activated. Retry")
+    if (showCurrentFileStatus() == "File activated"):
+        messagebox.showinfo("Activate file", "Files already activated")
+    else:
+        try:
+            boot_disable, startup_disable, boot_enable, startup_enable = readFile()
+            os.rename(boot_disable, boot_enable)
+            os.rename(startup_disable, startup_enable)
+            messagebox.showinfo("Activate file", "File activated !")
+        except FileNotFoundError:
+            messagebox.showerror("Activate file", "No files yet installed! Install it first")
 
 def deactivateFile():
     checkACL()
-    try:
-        boot_disable, startup_disable, boot_enable, startup_enable = readFile()
-        os.rename(boot_enable, boot_disable)
-        os.rename(startup_enable, startup_disable)
-        messagebox.showinfo("Deactivate file", "File deactivated !")
-    except FileNotFoundError:
-        messagebox.showerror("Deactivate file", "Path not found or file already deactivated. Retry")
+    if (showCurrentFileStatus() == "File deactivated"):
+        messagebox.showinfo("Dectivate file", "Files already deactivated")
+    else:
+        try:
+            boot_disable, startup_disable, boot_enable, startup_enable = readFile()
+            os.rename(boot_enable, boot_disable)
+            os.rename(startup_enable, startup_disable)
+            messagebox.showinfo("Deactivate file", "File deactivated !")
+        except FileNotFoundError:
+            messagebox.showerror("Deactivate file", "Path not found or file already deactivated. Retry")
 
 def findOldString():
     try:
@@ -162,7 +176,19 @@ def replaceString():
 
             messagebox.showinfo("Replace unique key", "Unique key saved successfully!")
     except FileNotFoundError:
-        messagebox.showerror("Replace unique key", "Path not found!")
+        messagebox.showerror("Replace unique key", "Path of files not found!")
+
+def showCurrentFileStatus():
+    try:
+        boot_disable, startup_disable, boot_enable, startup_enable = readFile()
+        
+        if (os.path.isfile(boot_disable) & os.path.isfile(startup_disable)):
+            return "File deactivated"
+        if (os.path.isfile(boot_enable) & os.path.isfile(startup_enable)):
+            return "File activated"
+    
+    except FileNotFoundError:
+        return "No files yet installed"
 
 folder = tk.Button(win, text="Choose Folder", width=15, height=5, command=choosePath)
 install = tk.Button(win, text="Install file", width=15, height=5, command=installFile)
@@ -187,6 +213,14 @@ newUniqueKey_label.place(x = 300, y = 90)
 newUniqueKey_entry = tk.Entry(win, textvariable=newUniqueKey)
 newUniqueKey_entry.pack(fill='x', expand=True)
 newUniqueKey_entry.place(x = 425, y = 90)
+
+fileStatus = tk.Label(win, text="Current file status: ")
+fileStatus.pack(fill='x', expand=True)
+fileStatus.place(x = 300, y = 110)
+
+fileStatusValue = tk.Label(win, text=showCurrentFileStatus())
+fileStatusValue.pack(fill='x', expand=True)
+fileStatusValue.place(x = 425, y = 110)
 
 folder.place(x = 30,y = 30)
 install.place(x = 150, y = 30)

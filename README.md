@@ -12,6 +12,7 @@
 - [ ] Background & Icon
 - [x] Show current path
 - [x] Show current key
-- [ ] Show current file status
+- [x] Show current file status
 - [x] Custom rule for session
 - [ ] Instructions
+- [ ] Update UI Runtime
