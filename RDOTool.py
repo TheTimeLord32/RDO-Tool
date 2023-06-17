@@ -5,7 +5,8 @@ from tkinter import filedialog
 
 win=tk.Tk()
 win.title('RDO Tool')
-win.geometry('700x400')
+win.geometry('725x375')
+newUniqueKey = tk.StringVar()
 
 def choosePath():
     root = tk.Tk()
@@ -190,43 +191,60 @@ def showCurrentFileStatus():
     except FileNotFoundError:
         return "No files yet installed"
 
-folder = tk.Button(win, text="Choose Folder", width=15, height=5, command=choosePath)
-install = tk.Button(win, text="Install file", width=15, height=5, command=installFile)
-activate = tk.Button(win, text = "Activate file", width=15, height=5, command=activateFile)
-deactivate = tk.Button(win, text = "Deactivate file", width=15, height=5, command=deactivateFile)
-replace = tk.Button(win, text="Replace unique key", width=32, height=5, command=replaceString)
+def showInstructions(tkWindow, xValue, textList):
+    yStartValue = 175
+    for value in textList:
+        instructions = tk.Label(tkWindow, text=value)
+        instructions.pack(fill="x", expand=True)
+        instructions.place(x = xValue, y = yStartValue)
+        yStartValue += 20
 
-showPath()
-currentUniqueKey_label = tk.Label(win, text="Current unique key: ")
-currentUniqueKey_label.pack(fill='x', expand=True)
-currentUniqueKey_label.place(x = 300, y = 70)
+def createLabels():
+    currentUniqueKey_label = tk.Label(win, text="Current unique key: ")
+    currentUniqueKey_label.pack(fill='x', expand=True)
+    currentUniqueKey_label.place(x = 300, y = 70)
 
-currentUniqueKeyValue = tk.Label(win, text=findOldString())
-currentUniqueKeyValue.pack(fill='x', expand=True)
-currentUniqueKeyValue.place(x = 425, y = 70)
+    currentUniqueKeyValue = tk.Label(win, text=findOldString())
+    currentUniqueKeyValue.pack(fill='x', expand=True)
+    currentUniqueKeyValue.place(x = 425, y = 70)
 
-newUniqueKey = tk.StringVar()
-newUniqueKey_label = tk.Label(win, text="New unique key: ")
-newUniqueKey_label.pack(fill='x', expand=True)
-newUniqueKey_label.place(x = 300, y = 90)
+    newUniqueKey_label = tk.Label(win, text="New unique key: ")
+    newUniqueKey_label.pack(fill='x', expand=True)
+    newUniqueKey_label.place(x = 300, y = 90)
 
-newUniqueKey_entry = tk.Entry(win, textvariable=newUniqueKey)
-newUniqueKey_entry.pack(fill='x', expand=True)
-newUniqueKey_entry.place(x = 425, y = 90)
+    newUniqueKey_entry = tk.Entry(win, textvariable=newUniqueKey)
+    newUniqueKey_entry.pack(fill='x', expand=True)
+    newUniqueKey_entry.place(x = 425, y = 90)
 
-fileStatus = tk.Label(win, text="Current file status: ")
-fileStatus.pack(fill='x', expand=True)
-fileStatus.place(x = 300, y = 110)
+    fileStatus = tk.Label(win, text="Current file status: ")
+    fileStatus.pack(fill='x', expand=True)
+    fileStatus.place(x = 300, y = 110)
 
-fileStatusValue = tk.Label(win, text=showCurrentFileStatus())
-fileStatusValue.pack(fill='x', expand=True)
-fileStatusValue.place(x = 425, y = 110)
+    fileStatusValue = tk.Label(win, text=showCurrentFileStatus())
+    fileStatusValue.pack(fill='x', expand=True)
+    fileStatusValue.place(x = 425, y = 110)
 
-folder.place(x = 30,y = 30)
-install.place(x = 150, y = 30)
-activate.place(x = 30, y = 120)
-deactivate.place(x = 150, y = 120)
-replace.place(x = 30, y = 210)
+def createButtons():
+    folder = tk.Button(win, text="Choose Folder", width=15, height=5, command=choosePath)
+    install = tk.Button(win, text="Install file", width=15, height=5, command=installFile)
+    activate = tk.Button(win, text = "Activate file", width=15, height=5, command=activateFile)
+    deactivate = tk.Button(win, text = "Deactivate file", width=15, height=5, command=deactivateFile)
+    replace = tk.Button(win, text="Replace unique key", width=32, height=5, command=replaceString)
 
-win.mainloop()
-os._exit(0)
+    folder.place(x = 30,y = 30)
+    install.place(x = 150, y = 30)
+    activate.place(x = 30, y = 120)
+    deactivate.place(x = 150, y = 120)
+    replace.place(x = 30, y = 210)
+
+def main():
+    createButtons()
+    createLabels()
+    showPath()
+    instructionsText = ["--------------------Instructions--------------------", "1. Choose folder to Red Dead Redemption 2 game path", "2. Press Install file to download the needed text files", "3. Change the unique key to one of your liking and press Replace Unique Key", "4. You're ready to play with your friends!"]
+    showInstructions(win, 300, instructionsText)
+    win.mainloop()
+    os._exit(0)
+
+if __name__ == "__main__":
+    main()
