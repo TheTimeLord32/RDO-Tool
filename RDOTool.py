@@ -40,16 +40,19 @@ def showPath():
         pass
 
 def checkACL():
-    path = open("path.txt", "r")
-    value = path.readline()
-    path.close()
     try:
-        os.access(value, os.W_OK)               #check write acl
-        os.access(value, os.R_OK)               #check read acl
-        os.access(value, os.X_OK)               #check exec acl
-        os.access(value, os.X_OK | os.W_OK)     #check write file acl
-    except PermissionError:
-        messagebox.showerror("RDO Tool", "Restart the program with Administrator permission to access this folder !")
+        path = open("path.txt", "r")
+        value = path.readline()
+        path.close()
+        try:
+            os.access(value, os.W_OK)               #check write acl
+            os.access(value, os.R_OK)               #check read acl
+            os.access(value, os.X_OK)               #check exec acl
+            os.access(value, os.X_OK | os.W_OK)     #check write file acl
+        except PermissionError:
+            messagebox.showerror("RDO Tool", "Restart the program with Administrator permission to access this folder !")
+    except FileNotFoundError:
+            pass
 
 def installFile():
     try:
@@ -129,22 +132,21 @@ def deactivateFile():
 
 def findOldString():
     try:
-        path = open("path.txt", "r")
-        directory = path.readline()
-        path.close()
-        boot_enable = directory + "/x64/boot_launcher_flow.ymt"
-        startup_enable = directory + "/x64/data/startup.meta"
+        boot_disable, startup_disable, boot_enable, startup_enable = readFile()
 
-        files = [boot_enable, startup_enable]
+        if (os.path.isfile(boot_enable) & os.path.isfile(startup_enable)):
+            files = [boot_enable, startup_enable]
 
-        for x in files:
-            with open(x, 'r') as file:
-                file_contents = file.readlines()
-                secondline = file_contents[1].strip()
+            for x in files:
+                with open(x, 'r') as file:
+                    file_contents = file.readlines()
+                    secondline = file_contents[1].strip()
 
-        oldKey = secondline[4: -3]
-        win.update()
-        return oldKey
+            oldKey = secondline[4: -3]
+            win.update()
+            return oldKey
+        if (os.path.isfile(boot_disable) & os.path.isfile(startup_disable)):
+            return "No key detected from deactivated files"
 
     except FileNotFoundError:
         return "No files yet installed"
@@ -241,7 +243,7 @@ def main():
     createButtons()
     createLabels()
     showPath()
-    instructionsText = ["--------------------Instructions--------------------", "1. Choose folder to Red Dead Redemption 2 game path", "2. Press Install file to download the needed text files", "3. Change the unique key to one of your liking and press Replace Unique Key", "4. You're ready to play with your friends!"]
+    instructionsText = ["--------------------Instructions--------------------", "1. Choose folder to Red Dead Redemption 2 game path", "2. Press Install file to download the needed text files", "3. Change the unique key to one of your liking and press Replace Unique Key", "4. You're ready to play with your friends!", "Note: the tool is correctly working when no splash screen appears"]
     showInstructions(win, 300, instructionsText)
     win.mainloop()
     os._exit(0)
