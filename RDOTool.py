@@ -1,5 +1,6 @@
 import tkinter as tk
 import os, requests
+import logging
 from tkinter import messagebox
 from tkinter import filedialog
 
@@ -7,6 +8,7 @@ win=tk.Tk()
 win.title('RDO Tool')
 win.geometry('725x375')
 newUniqueKey = tk.StringVar()
+logging.basicConfig(filename='RDOTool.log', filemode='w', format='%(asctime)s | %(funcName)20s():%(lineno)s | %(message)s', level=logging.DEBUG)
 
 def choosePath():
     root = tk.Tk()
@@ -17,18 +19,21 @@ def choosePath():
         file_path = filedialog.askdirectory()
         root.update()
         showPath()
+        logging.debug("Path not choosen")
     else:
         file = open("path.txt", "w")
         file.write(file_path)
         file.close()
         messagebox.showinfo("Choose Folder", "Path saved successfully !")
         showPath()
+        logging.debug("Path choosen")
 
 def showPath():
     if (os.path.exists("path.txt")):
         path = open("path.txt", "r")
         value = path.readline()
         path.close()
+        logging.debug("Path shown")
         return value
     else:
         return "No path yet choosen"
@@ -43,8 +48,10 @@ def checkACL():
             os.access(value, os.R_OK)               #check read acl
             os.access(value, os.X_OK)               #check exec acl
             os.access(value, os.X_OK | os.W_OK)     #check write file acl
+            logging.debug("ACL obtained")
         except PermissionError:
             messagebox.showerror("RDO Tool", "Restart the program with Administrator permission to access this folder !")
+            logging.debug("ACL not obtained")
     except FileNotFoundError:
             pass
 
@@ -52,8 +59,10 @@ def installFile():
     boot_disable, startup_disable, boot_enable, startup_enable = readFile()
         
     if (os.path.isfile(boot_disable) & os.path.isfile(startup_disable)):
+        logging.debug("File installed, deactivated")
         return messagebox.showinfo("Install file", "Files already installed but deactivated !")
     if (os.path.isfile(boot_enable) & os.path.isfile(startup_enable)):
+        logging.debug("File installed, activated")
         return messagebox.showinfo("Install file", "Files already installed and activated !")
     else:
         path = open("path.txt", "r")
@@ -64,6 +73,7 @@ def installFile():
         startupMETA = value + '/x64/data/' + 'startup.meta'
 
         if (os.path.isfile(bootLauncherFlowYMT) | os.path.isfile(startupMETA)):
+            logging.debug("Files already installed")
             messagebox.showinfo("Install file", "Files already installed !")
             pass
         else:
@@ -73,15 +83,19 @@ def installFile():
                 with open(bootLauncherFlowYMT, 'wb') as f:
                     f.write(r1.content)
                 f.close()
+                logging.debug("File boot installed")
             
                 urlstartupMETA = "https://raw.githubusercontent.com/TheTimeLord32/Red-Dead-Online-Tool/master/src/startup.meta"
                 r2 = requests.get(urlstartupMETA)
                 with open(startupMETA, 'wb') as f:
                     f.write(r2.content)
                 f.close()
+                logging.debug("File startup installed")
             except FileNotFoundError:
+                logging.exception("No path")
                 messagebox.showerror("Install file", "Needed folders not found. Rechoose Path !")
             else:
+                logging.debug("Files installed success")
                 messagebox.showinfo("Install file", "Files installed successfully !")
 
 def readFile():
@@ -97,6 +111,7 @@ def readFile():
 def activateFile():
     checkACL()
     if (showCurrentFileStatus() == "File activated"):
+        logging.debug("Files already activated")
         messagebox.showinfo("Activate file", "Files already activated")
     else:
         try:
@@ -104,12 +119,15 @@ def activateFile():
             os.rename(boot_disable, boot_enable)
             os.rename(startup_disable, startup_enable)
             messagebox.showinfo("Activate file", "File activated !")
+            logging.debug("Files activated")
         except FileNotFoundError:
+            logging.exception("File not installed")
             messagebox.showerror("Activate file", "No files yet installed! Install it first")
 
 def deactivateFile():
     checkACL()
     if (showCurrentFileStatus() == "File deactivated"):
+        logging.debug("Files already deactivated")
         messagebox.showinfo("Dectivate file", "Files already deactivated")
     else:
         try:
@@ -117,7 +135,9 @@ def deactivateFile():
             os.rename(boot_enable, boot_disable)
             os.rename(startup_enable, startup_disable)
             messagebox.showinfo("Deactivate file", "File deactivated !")
+            logging.debug("Files deactivated")
         except FileNotFoundError:
+            logging.exception("File not installed")
             messagebox.showerror("Deactivate file", "Path not found or file already deactivated. Retry")
 
 def findOldString():
@@ -134,24 +154,24 @@ def findOldString():
 
             oldKey = secondline[4: -3]
             win.update()
+            logging.debug("Key found")
             return oldKey
         if (os.path.isfile(boot_disable) & os.path.isfile(startup_disable)):
+            logging.debug("File deactivate, no key")
             return "No key detected from deactivated files"
 
     except FileNotFoundError:
+        logging.exception("No file installed")
         return "No files yet installed"
 
 def replaceString():
     try:
-        path = open("path.txt", "r")
-        directory = path.readline()
-        path.close()
-        boot_enable = directory + "/x64/boot_launcher_flow.ymt"
-        startup_enable = directory + "/x64/data/startup.meta"
+        boot_disable, startup_disable, boot_enable, startup_enable = readFile()
         old_string = findOldString()
         new_string = newUniqueKey.get()
 
         if (not new_string):
+            logging.debug("Empty key")
             messagebox.showerror("Replace unique key", "Empty unique key")
         else:
             files = [boot_enable, startup_enable]
@@ -167,8 +187,10 @@ def replaceString():
                 with open(file_path, 'w') as file:
                     file.write(modified_contents)
 
+            logging.debug("Key replaced")
             messagebox.showinfo("Replace unique key", "Unique key saved successfully!")
     except FileNotFoundError:
+        logging.exception("Path-files missing")
         messagebox.showerror("Replace unique key", "Path of files not found!")
 
 def showCurrentFileStatus():
