@@ -29,15 +29,9 @@ def showPath():
         path = open("path.txt", "r")
         value = path.readline()
         path.close()
-        currentPath = tk.Label(win, text="Current Folder Path:")
-        currentPath.pack(fill='x', expand=True)
-        currentPath.place(x = 300, y=30)
-        
-        currentPathValue = tk.Label(win, text=value)
-        currentPathValue.pack(fill='x', expand=True)
-        currentPathValue.place(x = 300, y=50)
+        return value
     else:
-        pass
+        return "No path yet choosen"
 
 def checkACL():
     try:
@@ -55,15 +49,13 @@ def checkACL():
             pass
 
 def installFile():
-    try:
-        boot_disable, startup_disable, boot_enable, startup_enable = readFile()
+    boot_disable, startup_disable, boot_enable, startup_enable = readFile()
         
-        if (os.path.isfile(boot_disable) & os.path.isfile(startup_disable)):
-            return messagebox.showinfo("Install file", "Files already installed but deactivated !")
-        if (os.path.isfile(boot_enable) & os.path.isfile(startup_enable)):
-            return messagebox.showinfo("Install file", "Files already installed and activated !")
-        
-    except FileNotFoundError:
+    if (os.path.isfile(boot_disable) & os.path.isfile(startup_disable)):
+        return messagebox.showinfo("Install file", "Files already installed but deactivated !")
+    if (os.path.isfile(boot_enable) & os.path.isfile(startup_enable)):
+        return messagebox.showinfo("Install file", "Files already installed and activated !")
+    else:
         path = open("path.txt", "r")
         value = path.readline()
         path.close()
@@ -91,8 +83,6 @@ def installFile():
                 messagebox.showerror("Install file", "Needed folders not found. Rechoose Path !")
             else:
                 messagebox.showinfo("Install file", "Files installed successfully !")
-    except FileNotFoundError:
-            messagebox.showerror("Install file", "Path not found. Choose folder first")
 
 def readFile():
     path = open("path.txt", "r")
@@ -202,6 +192,14 @@ def showInstructions(tkWindow, xValue, textList):
         yStartValue += 20
 
 def createLabels():
+    currentPath = tk.Label(win, text="Current Folder Path:")
+    currentPath.pack(fill='x', expand=True)
+    currentPath.place(x = 300, y=30)
+    
+    currentPathValue = tk.Label(win, text=showPath())
+    currentPathValue.pack(fill='x', expand=True)
+    currentPathValue.place(x = 300, y=50)
+
     currentUniqueKey_label = tk.Label(win, text="Current unique key: ")
     currentUniqueKey_label.pack(fill='x', expand=True)
     currentUniqueKey_label.place(x = 300, y = 70)
@@ -248,5 +246,4 @@ def main():
     win.mainloop()
     os._exit(0)
 
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__": main()
