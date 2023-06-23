@@ -1,8 +1,8 @@
 /build
 /dist
 /**/*.spec
-/path.txt
 /x64
 .venv
 .vscode
 *.log
+*.txt

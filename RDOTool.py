@@ -8,29 +8,26 @@ win=tk.Tk()
 win.title('RDO Tool')
 win.geometry('725x375')
 newUniqueKey = tk.StringVar()
-logging.basicConfig(filename='RDOTool.log', filemode='w', format='%(asctime)s | %(funcName)20s():%(lineno)s | %(message)s', level=logging.DEBUG)
+logging.basicConfig(filename='RDOTool.log', filemode='a', format='%(asctime)s | %(funcName)20s():%(lineno)s | %(message)s', level=logging.DEBUG)
+pathFileName = "RDOTool.txt"
 
 def choosePath():
-    root = tk.Tk()
-    root.withdraw()
     file_path = filedialog.askdirectory()
     while file_path == "":
         messagebox.showerror("Choose Folder", "No Path Selected !")
         file_path = filedialog.askdirectory()
-        root.update()
         showPath()
         logging.debug("Path not choosen")
     else:
-        file = open("path.txt", "w")
+        file = open(pathFileName, "w")
         file.write(file_path)
         file.close()
         messagebox.showinfo("Choose Folder", "Path saved successfully !")
-        showPath()
         logging.debug("Path choosen")
 
 def showPath():
-    if (os.path.exists("path.txt")):
-        path = open("path.txt", "r")
+    if (os.path.exists(pathFileName)):
+        path = open(pathFileName, "r")
         value = path.readline()
         path.close()
         logging.debug("Path shown")
@@ -40,7 +37,7 @@ def showPath():
 
 def checkACL():
     try:
-        path = open("path.txt", "r")
+        path = open(pathFileName, "r")
         value = path.readline()
         path.close()
         try:
@@ -57,7 +54,7 @@ def checkACL():
 
 def installFile():
     boot_disable, startup_disable, boot_enable, startup_enable = readFile()
-        
+
     if (os.path.isfile(boot_disable) & os.path.isfile(startup_disable)):
         logging.debug("File installed, deactivated")
         return messagebox.showinfo("Install file", "Files already installed but deactivated !")
@@ -65,7 +62,7 @@ def installFile():
         logging.debug("File installed, activated")
         return messagebox.showinfo("Install file", "Files already installed and activated !")
     else:
-        path = open("path.txt", "r")
+        path = open(pathFileName, "r")
         value = path.readline()
         path.close()
     
@@ -99,7 +96,7 @@ def installFile():
                 messagebox.showinfo("Install file", "Files installed successfully !")
 
 def readFile():
-    path = open("path.txt", "r")
+    path = open(pathFileName, "r")
     directory = path.readline()
     path.close()
     boot_disable = directory + "/x64/boot_launcher_flow.bak"
@@ -153,13 +150,11 @@ def findOldString():
                     secondline = file_contents[1].strip()
 
             oldKey = secondline[4: -3]
-            win.update()
             logging.debug("Key found")
             return oldKey
         if (os.path.isfile(boot_disable) & os.path.isfile(startup_disable)):
             logging.debug("File deactivate, no key")
             return "No key detected from deactivated files"
-
     except FileNotFoundError:
         logging.exception("No file installed")
         return "No files yet installed"
@@ -222,21 +217,21 @@ def createLabels():
     currentPathValue.pack(fill='x', expand=True)
     currentPathValue.place(x = 300, y=50)
 
-    currentUniqueKey_label = tk.Label(win, text="Current unique key: ")
-    currentUniqueKey_label.pack(fill='x', expand=True)
-    currentUniqueKey_label.place(x = 300, y = 70)
+    currentUniqueKeyLabel = tk.Label(win, text="Current unique key: ")
+    currentUniqueKeyLabel.pack(fill='x', expand=True)
+    currentUniqueKeyLabel.place(x = 300, y = 70)
 
     currentUniqueKeyValue = tk.Label(win, text=findOldString())
     currentUniqueKeyValue.pack(fill='x', expand=True)
     currentUniqueKeyValue.place(x = 425, y = 70)
 
-    newUniqueKey_label = tk.Label(win, text="New unique key: ")
-    newUniqueKey_label.pack(fill='x', expand=True)
-    newUniqueKey_label.place(x = 300, y = 90)
+    newUniqueKeyLabel = tk.Label(win, text="New unique key: ")
+    newUniqueKeyLabel.pack(fill='x', expand=True)
+    newUniqueKeyLabel.place(x = 300, y = 90)
 
-    newUniqueKey_entry = tk.Entry(win, textvariable=newUniqueKey)
-    newUniqueKey_entry.pack(fill='x', expand=True)
-    newUniqueKey_entry.place(x = 425, y = 90)
+    newUniqueKeyEntry = tk.Entry(win, textvariable=newUniqueKey)
+    newUniqueKeyEntry.pack(fill='x', expand=True)
+    newUniqueKeyEntry.place(x = 425, y = 90)
 
     fileStatus = tk.Label(win, text="Current file status: ")
     fileStatus.pack(fill='x', expand=True)
@@ -262,10 +257,8 @@ def createButtons():
 def main():
     createButtons()
     createLabels()
-    showPath()
     instructionsText = ["--------------------Instructions--------------------", "1. Choose folder to Red Dead Redemption 2 game path", "2. Press Install file to download the needed text files", "3. Change the unique key to one of your liking and press Replace Unique Key", "4. You're ready to play with your friends!", "Note: the tool is correctly working when no splash screen appears"]
     showInstructions(win, 300, instructionsText)
     win.mainloop()
-    os._exit(0)
 
 if __name__ == "__main__": main()

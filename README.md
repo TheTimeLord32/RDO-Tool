@@ -14,5 +14,6 @@
 - [x] Show current key
 - [x] Show current file status
 - [x] Custom rule for session
+- [x] Logging
 - [ ] Instructions expand
 - [ ] Update UI Runtime
